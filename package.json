@@ -1,6 +1,6 @@
 {
   "name": "homebridge-1c-matter",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Matter-native Homebridge 2.0 plugin for Xiaomi Mi Robot Vacuum-Mop 1C",
   "license": "MIT",
   "type": "module",
@@ -30,21 +30,28 @@
     "dist",
     "config.schema.json",
     "CHANGELOG.md",
+    "LICENSE",
     "README.md",
     "assets"
   ],
   "scripts": {
     "build": "tsc",
     "check:local": "node test_action.js",
+    "test": "npm run build && node --test test/*.test.js",
     "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "homebridge": "^2.0.0",
-    "typescript": "^5.3.0"
+    "@types/node": "^22.0.0",
+    "homebridge": "^2.4.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "miio": "^0.15.6"
+  },
+  "overrides": {
+    "cross-spawn": "^7.0.6",
+    "mem": "^4.3.0",
+    "yargs-parser": "^13.1.2"
   }
 }

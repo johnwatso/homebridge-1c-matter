@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-08-17
+
+### Fixed
+- **Property Error Recovery:** MIoT per-property error responses now fail the status read and enter the existing retry/backoff path instead of being interpreted as device values. Exhausted property retries now surface a clear error rather than silently returning an empty result.
+- **Diagnostic Accuracy:** The local diagnostic helper now reports invalid or failed `get_properties` responses instead of displaying a misleading partial summary.
+- **Secret-Safe Validation:** Invalid local tokens are no longer included in Homebridge log messages, and IP validation now rejects out-of-range IPv4 addresses.
+- **Dependency Audit:** Pinned patched transitive dependency versions through npm overrides, removing the known production audit findings without downgrading `miio`.
+
+### Added
+- **Automated Tests and CI:** Added Node's built-in test suite and a GitHub Actions matrix for Node 22 and 24, including the production dependency audit.
+- **License:** Added the MIT license text to the repository and npm package.
+
+### Changed
+- **Tooling:** Updated the Homebridge development dependency to 2.4 and aligned Node type definitions with the supported Node 22+ runtime.
+- **Package Size:** Reduced the bundled logo size while retaining a high-resolution image for the README.
+
 ## [1.1.3] - 2026-06-22
 
 ### Added
