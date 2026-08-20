@@ -94,6 +94,8 @@ export class OneCMatterPlatform implements DynamicPlatformPlugin {
               { operationalStateId: 2 }, // Paused
               { operationalStateId: 3 }, // Error
               { operationalStateId: 64 }, // SeekingCharger
+              { operationalStateId: 65 }, // Charging
+              { operationalStateId: 66 }, // Docked
             ],
           },
           rvcRunMode: {

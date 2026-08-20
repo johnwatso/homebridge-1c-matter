@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2026-08-21
+
+### Fixed
+- **External Control State:** Poll the local operational state every 5 seconds, so state changes made in Mi Home are promptly reflected in Apple Home and Siri without increasing the full status/consumables polling frequency.
+- **Dock State Reporting:** Expose Matter's distinct `Charging` and `Docked` operational states instead of reporting both as generic stopped, preventing Siri from using an inaccurate dock status.
+
 ## [1.1.4] - 2026-08-17
 
 ### Fixed

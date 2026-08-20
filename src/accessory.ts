@@ -50,6 +50,10 @@ const CLEAN_INFO_PIID = 21;
 const WORK_MODE_ROOM = 18;
 const DEFAULT_MATTER_UPDATE_TIMEOUT_MS = 10000;
 const DEFAULT_STATUS_UPDATE_WATCHDOG_MS = 90000;
+const DEFAULT_POLL_INTERVAL_SECONDS = 30;
+// Mi Home changes are not pushed over the local miIO transport. Keep the
+// Matter view fresh enough that Siri does not act on an old docked state.
+const EXTERNAL_STATE_POLL_INTERVAL_MS = 5000;
 
 const CONSUMABLES = [
   { key: 'mainBrush', label: 'Main brush', siid: 26, timePiid: 1, lifePiid: 2 },
@@ -75,6 +79,7 @@ export class OneCVacuumAccessory {
   private lastConsumableSummary = '';
   private readonly matterUpdateTimeoutMs: number;
   private readonly statusUpdateWatchdogMs: number;
+  private readonly pollIntervalMs: number;
 
   constructor(
     private readonly platform: OneCMatterPlatform,
@@ -90,6 +95,10 @@ export class OneCVacuumAccessory {
     this.statusUpdateWatchdogMs = Number.isFinite(statusUpdateWatchdog) && statusUpdateWatchdog > 0
       ? statusUpdateWatchdog
       : DEFAULT_STATUS_UPDATE_WATCHDOG_MS;
+    const pollInterval = Number(this.platform.config.pollInterval);
+    this.pollIntervalMs = (Number.isFinite(pollInterval) && pollInterval > 0
+      ? pollInterval
+      : DEFAULT_POLL_INTERVAL_SECONDS) * 1000;
 
     // Register handlers
     this.accessory.handlers = {
@@ -161,8 +170,8 @@ export class OneCVacuumAccessory {
     }
 
     // Polling
-    const interval = (this.platform.config.pollInterval || 30) * 1000;
-    setInterval(() => this.updateStatus(), interval);
+    setInterval(() => this.updateStatus(), this.pollIntervalMs);
+    setInterval(() => this.updateStatus(false, false), EXTERNAL_STATE_POLL_INTERVAL_MS);
     setTimeout(() => this.updateStatus(), 1000); // Initial update after Matter registration settles
   }
 
@@ -232,7 +241,7 @@ export class OneCVacuumAccessory {
     }
   }
 
-  async updateStatus(force = false) {
+  async updateStatus(force = false, includeConsumables = true) {
     const now = Date.now();
     if (this.isUpdating) {
       const updateAge = now - this.updateStartedAt;
@@ -259,10 +268,10 @@ export class OneCVacuumAccessory {
         { siid: 2, piid: 1 }, // Battery Level
         { siid: 2, piid: 2 }, // Charging State
         { siid: 18, piid: 6 }, // Cleaning Mode / suction level
-        ...CONSUMABLES.flatMap(item => [
+        ...(includeConsumables ? CONSUMABLES.flatMap(item => [
           { siid: item.siid, piid: item.timePiid },
           { siid: item.siid, piid: item.lifePiid },
-        ]),
+        ]) : []),
       ]);
 
       if (!props || props.length === 0) return;
@@ -282,18 +291,23 @@ export class OneCVacuumAccessory {
       if (fault !== undefined && fault !== 0) {
         this.platform.log.warn(`Vacuum fault ${fault}: ${describeFault(fault)}`);
       }
-      this.logConsumables(consumables);
+      if (includeConsumables) {
+        this.logConsumables(consumables);
+      }
       this.consecutiveFailures = 0;
       this.nextAllowedUpdate = 0;
 
       // Map Dreame 1C status to Matter RVC Operational State.
       // DeviceStatus: 1 Sweeping, 2 Idle, 3 Paused, 4 Error, 5 GoCharging, 6 Charging, 12 SweepingAndMopping, 13 ChargingComplete
-      // Matter OperationalState: 0: Stopped, 1: Running, 2: Paused, 3: Error, 64: SeekingCharger
+      // Matter OperationalState: 0: Stopped, 1: Running, 2: Paused, 3: Error,
+      // 64: SeekingCharger, 65: Charging, 66: Docked.
       let opState = 0;
       if ([1, 7, 12].includes(status)) opState = 1;
       else if (status === 3) opState = 2;
       else if (status === 4 || (fault !== undefined && fault !== 0)) opState = 3;
       else if (status === 5) opState = 64;
+      else if (status === 13 || (charging === 4 && battery === 100)) opState = 66;
+      else if (status === 6 || [1, 5].includes(charging)) opState = 65;
 
       const matter = this.platform.api.matter!;
       await this.updateClusterState(matter.clusterNames.RvcOperationalState, {
@@ -331,7 +345,7 @@ export class OneCVacuumAccessory {
 
     } catch (e: any) {
       this.consecutiveFailures++;
-      const baseInterval = (this.platform.config.pollInterval || 30) * 1000;
+      const baseInterval = Math.min(this.pollIntervalMs, EXTERNAL_STATE_POLL_INTERVAL_MS);
       const backoff = Math.min(baseInterval * 2 ** this.consecutiveFailures, 5 * 60 * 1000);
       this.nextAllowedUpdate = Date.now() + backoff;
       this.platform.log.error('Error updating status:', e.message);
