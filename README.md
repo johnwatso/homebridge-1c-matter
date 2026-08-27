@@ -21,6 +21,8 @@ Published on npm as [`homebridge-1c-matter`](https://www.npmjs.com/package/homeb
 ## About
 Homebridge Xiaomi 1C Vacuum brings the Xiaomi Mi Robot Vacuum-Mop 1C (`dreame.vacuum.mc1808`) into Apple Home as a native Matter robotic vacuum. It talks directly to the vacuum over your local network using Xiaomi's miIO/MIoT protocol, so day-to-day controls do not depend on Xiaomi Cloud.
 
+Built and maintained around the author's own Xiaomi Mi Robot Vacuum-Mop 1C, this plugin intentionally focuses on making that specific model work well in Apple Home.
+
 The plugin focuses on the controls that make sense in Apple Home: start, pause, resume, return to dock, suction mode, battery, charging state, fault status, consumable status, Siri, scenes, and automations. Your existing Xiaomi map, no-go zones, and saved cleaning rules remain managed by the Mi Home app and are respected by the vacuum during normal whole-home cleans.
 
 ## Supported Models
