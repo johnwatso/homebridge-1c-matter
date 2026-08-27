@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-08-27
+
+### Fixed
+- **Siri Return-to-Dock After Remote Control:** Mi Home's manual remote control can leave the vacuum reporting `Idle` with a stale local "charging / docked" property after it has been moved away from its dock. The plugin now trusts the explicit operational status for charging and docked state, so it reports that remote-moved idle vacuum as off-dock and Siri can send the return-to-dock command.
+- **Conservative Battery Charge State:** Battery charging is no longer inferred from the stale local charging property while the vacuum is idle, preventing Apple Home from incorrectly treating an off-dock vacuum as fully charged or docked.
+
 ## [1.1.5] - 2026-08-21
 
 ### Fixed

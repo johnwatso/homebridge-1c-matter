@@ -92,3 +92,45 @@ test('reports charging and fully charged dock states to Matter', async t => {
     payload: { operationalState: 66 },
   });
 });
+
+test('does not report a Mi Home-started clean as charging when the charge property is stale', async t => {
+  const { controller, updates } = createFixture(t, {}, {
+    status: 1,
+    charging: 4,
+    battery: 100,
+  });
+
+  await controller.updateStatus();
+
+  assert.deepEqual(updates[0], {
+    uuid: 'test-vacuum',
+    cluster: 'rvcOperationalState',
+    payload: { operationalState: 1 },
+  });
+  assert.deepEqual(updates[3], {
+    uuid: 'test-vacuum',
+    cluster: 'powerSource',
+    payload: { batPercentRemaining: 200, batChargeState: 3 },
+  });
+});
+
+test('does not report an idle vacuum moved with Mi Home remote control as docked', async t => {
+  const { controller, updates } = createFixture(t, {}, {
+    status: 2,
+    charging: 4,
+    battery: 100,
+  });
+
+  await controller.updateStatus();
+
+  assert.deepEqual(updates[0], {
+    uuid: 'test-vacuum',
+    cluster: 'rvcOperationalState',
+    payload: { operationalState: 0 },
+  });
+  assert.deepEqual(updates[3], {
+    uuid: 'test-vacuum',
+    cluster: 'powerSource',
+    payload: { batPercentRemaining: 200, batChargeState: 3 },
+  });
+});

@@ -306,8 +306,13 @@ export class OneCVacuumAccessory {
       else if (status === 3) opState = 2;
       else if (status === 4 || (fault !== undefined && fault !== 0)) opState = 3;
       else if (status === 5) opState = 64;
-      else if (status === 13 || (charging === 4 && battery === 100)) opState = 66;
-      else if (status === 6 || [1, 5].includes(charging)) opState = 65;
+      // Do not infer a docked state from the charging property. When the 1C
+      // is moved with Mi Home's remote control, it can remain Idle while
+      // retaining a stale "charging / docked" value. Reporting Docked makes
+      // Siri reject Go Home before it reaches this plugin. Status 6 and 13
+      // are the device's explicit charging and fully-docked states.
+      else if (status === 13) opState = 66;
+      else if (status === 6) opState = 65;
 
       const matter = this.platform.api.matter!;
       await this.updateClusterState(matter.clusterNames.RvcOperationalState, {
@@ -329,11 +334,14 @@ export class OneCVacuumAccessory {
       if (battery !== undefined) {
         // Matter batPercentRemaining is 0-200 (0.5% steps)
         let chargeState = 0; // Unknown
-        if ([1, 5].includes(charging)) {
+        // As above, trust the operational status rather than the charging
+        // property: Mi Home remote control can leave the latter stale after
+        // the vacuum is physically moved away from its dock.
+        if (status === 13) {
+          chargeState = 2; // IsAtFullCharge
+        } else if (status === 6) {
           chargeState = 1; // IsCharging
-        } else if (charging === 4) {
-          chargeState = battery === 100 ? 2 : 1; // IsAtFullCharge or IsCharging
-        } else if (charging === 2) {
+        } else {
           chargeState = 3; // IsNotCharging
         }
 
