@@ -35,7 +35,7 @@ Known identifiers for the supported model:
 - Dreame/MIoT model `dreame.vacuum.mc1808`
 - Hardware model `1C Vacuum (MC1808)`
 
-Other Xiaomi, Mi, Dreame, or Roborock vacuums may use different local MIoT properties and actions. They are not currently supported unless a matching model profile is added.
+Other Xiaomi, Mi, Dreame, or Roborock vacuums may work but they are untested, I personally own the 1C (STYTJ01ZHM) and have built this plugin for that exact model. If you would like more vacuums added, please let me know though keep in mind I wouldn't be able to test them.
 
 ## Features
 - **Native HomeKit Vacuum Support:** Appears as a native vacuum in the Home app (iOS 18+ / Homebridge 2.0+).
