@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-08-27
+
+### Added
+- **Structured Support:** Added GitHub issue forms for bug reports and feature requests so real-world model, network, and controller feedback can guide future updates.
+- **Remote-Control Troubleshooting:** Documented the Mi Home remote-control and Siri return-to-dock behaviour, including the quick state refresh introduced in 1.1.6.
+
+### Changed
+- **Discoverability:** Refined the repository description and added topics for Homebridge, Matter, Xiaomi, Mi Home, local LAN control, and robotic vacuums.
+
 ## [1.1.6] - 2026-08-27
 
 ### Fixed

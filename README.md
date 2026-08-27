@@ -115,8 +115,15 @@ npm run check:local -- <vacuum-ip> <token> <device-id> --reset side-brush
 ## Pairing
 Once Homebridge starts, check the logs for the **Matter QR Code**. Scan this code with your Home app to add the vacuum.
 
+## Mi Home Remote Control and Siri
+If you use Mi Home's manual remote control to move the vacuum away from its dock—for example, to retrieve it from under furniture—Homebridge refreshes the core operational state every five seconds. On version 1.1.6 or later, Siri should then be able to send the vacuum back to its dock normally.
+
+If Apple Home still shows an old state, wait a few seconds after moving the vacuum before asking Siri. The **Return to Dock** control in the Home app can also send the command directly.
+
 ## Support
 If you run into setup problems, local miIO timeouts, Homebridge/Matter pairing issues, or model-specific quirks, please open a [GitHub issue](https://github.com/johnwatso/homebridge-xiaomi-1c-vacuum/issues).
+
+Use the **Bug report** form for a reproducible problem and the **Feature request** form to share a useful workflow or missing control. Please never include your Xiaomi token in an issue.
 
 When reporting an issue, include your vacuum model, Homebridge version, Node.js version, network layout, and the output of:
 
